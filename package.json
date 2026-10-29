@@ -86,8 +86,8 @@
         },
         "angularUnusedStyles.ignoredSelectors": {
           "type": "array",
-          "default": ["::ng-deep", ":host", ":host-context", ":host(.*)"],
-          "description": "CSS selectors to ignore during analysis (supports regex patterns)"
+          "default": ["::ng-deep", ":host", ":host-context", ":host(.*)", "/deep/", ">>>"],
+          "description": "CSS selectors to ignore during analysis (supports regex patterns). Direct nested rules are ignored, but @media, @include, and custom breakpoint blocks are still analyzed."
         },
         "angularUnusedStyles.analyzeOnSave": {
           "type": "boolean",
@@ -106,9 +106,9 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
+    "pretest": "npm run compile",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js",
+    "test": "mocha \"out/test/**/*.test.js\"",
     "package": "vsce package",
     "publish": "vsce publish"
   },

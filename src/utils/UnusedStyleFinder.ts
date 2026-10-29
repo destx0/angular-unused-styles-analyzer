@@ -1,6 +1,6 @@
-import * as vscode from 'vscode';
 import { UnusedStyle, SelectorPosition } from '../types/ComponentInterfaces';
 import { SelectorMatcher } from './SelectorMatcher';
+import { DEFAULT_IGNORED_SELECTORS } from './IgnoredSelectors';
 
 export class UnusedStyleFinder {
     private selectorMatcher = new SelectorMatcher();
@@ -8,11 +8,9 @@ export class UnusedStyleFinder {
     findUnusedStyles(
         cssSelectors: Map<string, SelectorPosition>,
         usedSelectors: Set<string>,
-        styleDocument: vscode.TextDocument
+        ignoredSelectors: string[] = DEFAULT_IGNORED_SELECTORS
     ): UnusedStyle[] {
         const unused: UnusedStyle[] = [];
-        const config = vscode.workspace.getConfiguration('angularUnusedStyles');
-        const ignoredSelectors: string[] = config.get('ignoredSelectors', []);
         
         for (const [selector, position] of cssSelectors.entries()) {
             if (this.selectorMatcher.shouldIgnoreSelector(selector, ignoredSelectors)) {

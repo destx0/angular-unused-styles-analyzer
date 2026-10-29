@@ -9,13 +9,14 @@ A Visual Studio Code extension that automatically detects and highlights unused 
 🎯 **Angular-aware** - Understands Angular-specific patterns like `[class.myClass]`, `[ngClass]`, and `@HostBinding`
 ⚡ **Performance Optimized** - Lightweight analysis that won't slow down your development
 🎨 **SCSS Support** - Works with both CSS and SCSS files
-🚫 **Smart Ignoring** - Configurable ignored selectors (`:host`, `::ng-deep`, etc.)
+📐 **Nested SCSS & Breakpoints** - Analyzes rules inside `@media`, `@include`, custom at-rule blocks, and nested selectors (including `&`)
+🚫 **Smart Ignoring** - Configurable ignored selectors (`:host`, `::ng-deep`, etc.); direct rules inside them are skipped, but media queries and breakpoints are still checked
 
 ## How It Works
 
 The extension analyzes your Angular component files in three steps:
 
-1. **Extracts CSS selectors** from your `.component.scss` or `.component.css` files
+1. **Extracts CSS selectors** from your `.component.scss` or `.component.css` files, including nested rules and rules inside `@media`, `@include`, and custom at-rule blocks
 2. **Scans for usage** in your `.component.html` templates and `.component.ts` files
 3. **Highlights unused styles** with warning diagnostics directly in your editor
 
@@ -76,7 +77,9 @@ Configure the extension through VS Code settings (`Ctrl+,`):
     "::ng-deep",
     ":host",
     ":host-context",
-    ":host(.*)"
+    ":host(.*)",
+    "/deep/",
+    ">>>"
   ]
 }
 ```
@@ -88,7 +91,25 @@ Configure the extension through VS Code settings (`Ctrl+,`):
 | `enableRealTimeanalysis` | boolean | `true` | Enable real-time analysis as you type |
 | `analyzeOnSave` | boolean | `true` | Automatically analyze when files are saved |
 | `showInformationMessages` | boolean | `true` | Show completion messages after analysis |
-| `ignoredSelectors` | array | See above | CSS selectors to ignore (supports regex) |
+| `ignoredSelectors` | array | See above | CSS selectors to ignore (supports regex). Direct nested rules are ignored, while `@media` / `@include` content is still analyzed |
+
+### Ignoring Angular host and deep selectors
+
+The default `ignoredSelectors` cover `:host`, `:host(...)`, `:host-context(...)`, `::ng-deep`, `/deep/`, and `>>>`. Direct rules nested inside them are not reported, but responsive content is still analyzed:
+
+```scss
+:host {
+  .ignored-direct-rule { }        // not reported
+
+  @media (max-width: 600px) {
+    .unused-mobile-rule { }        // still reported when unused
+  }
+
+  @include breakpoint(mobile) {
+    .unused-breakpoint-rule { }    // still reported when unused
+  }
+}
+```
 
 ## Examples
 
@@ -133,6 +154,7 @@ export class MyComponent {
 - **Third-party libraries**: Styles used by external components may appear unused
 - **Complex selectors**: Very complex CSS selectors might have edge cases
 - **Build-time classes**: Classes added by build tools or preprocessors may not be detected
+- **Mixin definitions**: Selectors written inside `@mixin` definitions are skipped; rules in `@include` content blocks and at-rule wrappers are analyzed
 
 ## Troubleshooting
 
