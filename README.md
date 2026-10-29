@@ -26,7 +26,8 @@ The extension analyzes your Angular component files in three steps:
 - `class="my-class another-class"`
 - `id="my-element"`
 - `[class.dynamic-class]="condition"`
-- `[ngClass]="classObject"`
+- `[class]="{'dynamic-class': condition}"` (object, string, or ternary bindings)
+- `[ngClass]="classObject"` (objects, arrays, and ternary expressions)
 
 **TypeScript Component Detection:**
 - `renderer.addClass(element, 'my-class')`
@@ -187,6 +188,14 @@ npm run compile
 - Open an Angular project in the new window to test the extension
 
 ## Release Notes
+
+### 1.1.0
+- Nested SCSS support, including `&` resolution
+- Analyzes selectors inside `@media`, `@include`, and custom breakpoint blocks
+- Ignores direct `:host` / `::ng-deep` rules while still checking media and breakpoint content
+- Detects Angular `[class]` object, string, and ternary bindings
+- Improved `[ngClass]` parsing for objects, arrays, and nested quotes
+- Added unit tests (`npm test`)
 
 ### 1.0.0
 - Initial release
